@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "463356042858",
+    "firebase_url": "https://dicont47.firebaseio.com",
+    "project_id": "dicont47",
+    "storage_bucket": "dicont47.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463356042858:android:5c9f4705a975165439b413",
+        "android_client_info": {
+          "package_name": "dicont.dicont"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "463356042858-nvuoalrdclmkgent7lsmb0jkf6di3oi4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc53aBR_fCuniIxpIgl-cjjYRoEI0P9IQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "463356042858-nvuoalrdclmkgent7lsmb0jkf6di3oi4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
