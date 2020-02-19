@@ -90,20 +90,21 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
-
+/*
     @Override
     protected void onStop(){
         super.onStop();
+        if(mAuth.getCurrentUser() != null) {
+            //obtenemos una referencia al usuario actual
+            DatabaseReference estado =
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("Users")
+                            .child(mAuth.getCurrentUser().getUid());
 
-        //obtenemos una referencia al usuario actual
-        DatabaseReference estado =
-                FirebaseDatabase.getInstance().getReference()
-                        .child("Users")
-                        .child(mAuth.getCurrentUser().getUid());
-
-        //nos desuscribimos de la referencia para evitar que la app se abra ante cualquier cambio en la base de datos aunque la app este en segundo plano
-        estado.removeEventListener(valueEventListener);
-    }
+            //nos desuscribimos de la referencia para evitar que la app se abra ante cualquier cambio en la base de datos aunque la app este en segundo plano
+            estado.removeEventListener(valueEventListener);
+        }
+    }*/
 
     private void updateUI(FirebaseUser currentUser) {
         if (currentUser!=null){

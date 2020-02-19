@@ -214,6 +214,7 @@ public class FragmentMonotributo extends Fragment {
         User user = DataUser.getInstance().getUser();
         switch (user.getEstado()){
             case 1: //Sin monotributo
+            case 2: //Pago iniciado pero no confirmado
                 //SIN MONOTRIBUTO
                 constraintLayoutSinMonotributo = view.findViewById(R.id.cl_estado_sin_monotributo);
                 btnEmpezarMonotributo = view.findViewById(R.id.button_frag_monotributo_empezar_monotributo);
@@ -365,8 +366,10 @@ public class FragmentMonotributo extends Fragment {
                         User user = DataUser.getInstance().getUser();
 
                         //cambiamos el estado:2 "Iniciar proceso de pago"
-                        user.setEstado(2);
-
+                        //pero primero lo cambiamos a 1 por las dudas ya se haya encontrado en 2 por haberse iniciado un proceso de pago
+                        //anteriormente y no se haya completado. luego al volver a cambiar a 2 nos aseguramos que se activa la function
+                        //correspondiente en firebase
+                        user.setEstado(1);
                         user.setMonotributo(monotributo);
                         user.setFormulario(formulario);
 
@@ -379,6 +382,11 @@ public class FragmentMonotributo extends Fragment {
                         //Initialize Firebase Database
                         DatabaseReference mDatabase;
                         mDatabase = FirebaseDatabase.getInstance().getReference();
+                        mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
+
+                        //Además hacemos un doble cambio de la variable para asegurarnos que siempre se activa la funcion correspondiente
+                        //en Firebase functions
+                        user.setEstado(2);
                         mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
                         //Toast.makeText(getContext(),"Tu solicitud está siendo analizada por un profesional! Aguarda y verás", Toast.LENGTH_LONG).show();
                         progressDialog.setMessage("Iniciando proceso de pago. Espera unos segundos..");

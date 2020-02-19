@@ -7,6 +7,9 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.mercadopago.android.px.core.MercadoPagoCheckout;
 import com.mercadopago.android.px.model.Payment;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
@@ -26,8 +29,6 @@ import static dicont.dicont.FragmentMonotributo.REQUEST_CODE;
 
 public class Inicio extends AppCompatActivity {
 
-    User user;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +47,23 @@ public class Inicio extends AppCompatActivity {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
                 final Payment payment = (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
-                Log.e("Resultado del pago: ", payment.getPaymentStatus());
-                //Done!
+                Log.e("paymentStatus", payment.getPaymentStatus());
+                switch(payment.getPaymentStatus()){
+                    case "approved":
+                        FirebaseAuth mAuth;
+                        //actualizamos el estado de la instancia usuario
+                       User user =  DataUser.getInstance().getUser();
+                       user.setEstado(3);//Pago aprobado
+                        //actualizamos el user en la base de datos
+                        //Initialize Firebase Auth
+                        mAuth = FirebaseAuth.getInstance();
+                        //Initialize Firebase Database
+                        DatabaseReference mDatabase;
+                        mDatabase = FirebaseDatabase.getInstance().getReference();
+                        mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
+                        break;
+                }
+
             } else if (resultCode == RESULT_CANCELED) {
                 if (data != null && data.getExtras() != null
                         && data.getExtras().containsKey(MercadoPagoCheckout.EXTRA_ERROR)) {
