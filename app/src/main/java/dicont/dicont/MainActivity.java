@@ -1,27 +1,19 @@
 package dicont.dicont;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,8 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.io.Serializable;
-
+import dicont.dicont.Domain.DataUser;
 import dicont.dicont.Domain.User;
 import dicont.dicont.Login.Ingreso;
 import dicont.dicont.Login.Registro;
@@ -90,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
-/*
+
     @Override
     protected void onStop(){
         super.onStop();
@@ -104,12 +95,12 @@ public class MainActivity extends AppCompatActivity {
             //nos desuscribimos de la referencia para evitar que la app se abra ante cualquier cambio en la base de datos aunque la app este en segundo plano
             estado.removeEventListener(valueEventListener);
         }
-    }*/
+    }
 
     private void updateUI(FirebaseUser currentUser) {
         if (currentUser!=null){
             if(currentUser.isEmailVerified()) {
-                Toast.makeText(MainActivity.this, currentUser.getEmail() + " - " + currentUser.isEmailVerified(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, currentUser.getEmail() + " - Usuario verificado: " + currentUser.isEmailVerified(), Toast.LENGTH_SHORT).show();
                 progressDialog.setMessage("Espera unos instantes..");
                 progressDialog.show();
 
@@ -175,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
             textViewIngreso.setVisibility(View.VISIBLE);
             btnIngresar.setVisibility(View.VISIBLE);
             btnRegistrarse.setVisibility(View.VISIBLE);
-            Toast.makeText(MainActivity.this, "Fallo", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Usuario no logueado", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -32,13 +32,16 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'com.google.firebase:firebase-analytics:17.2.1' //Firebase Auth
-    implementation 'com.google.firebase:firebase-core:17.2.1' //Firebase Auth
-    implementation 'com.firebaseui:firebase-ui-auth:6.2.0'      //Firebase Auth
+    implementation 'com.google.firebase:firebase-analytics:17.2.1'  //Firebase Auth
+    implementation 'com.google.firebase:firebase-core:17.2.1'       //Firebase Auth
+    implementation 'com.firebaseui:firebase-ui-auth:6.2.0'          //Firebase Auth
     implementation 'com.google.android.material:material:1.0.0'
-    implementation 'com.google.firebase:firebase-database:19.2.0' //Firebase RealTime Database
-    implementation 'com.google.firebase:firebase-messaging:20.1.0' //Firebase Cloud Messaging
+    implementation 'com.google.firebase:firebase-database:19.2.0'   //Firebase RealTime Database
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'  //Firebase Cloud Messaging
     implementation 'com.mercadopago.android.px:checkout:4.27.0'
+    def room_version = "2.2.0-beta01"                               //ROOM
+    implementation "androidx.room:room-runtime:$room_version"       //ROOM
+    annotationProcessor "androidx.room:room-compiler:$room_version" //ROOM
 }
 
 apply plugin: 'com.google.gms.google-services' //Firebase

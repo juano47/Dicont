@@ -30,13 +30,22 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
-            showNotification(remoteMessage.getData().get("preferenceId"));
 
-            Intent intent = new Intent("preferenceIdMercadoPagoData");
-            intent.putExtra("preferenceId", remoteMessage.getData().get("preferenceId"));
-            Log.e("firebase service", "llega");
+            if(remoteMessage.getData().get("preferenceId")!=null) {
+                Intent intent = new Intent("preferenceIdMercadoPagoData");
+                intent.putExtra("preferenceId", remoteMessage.getData().get("preferenceId"));
+                Log.e("firebase service", "llega");
+                broadcaster.sendBroadcast(intent);
+            }
 
-            broadcaster.sendBroadcast(intent);
+            if (remoteMessage.getData().get("aviso_titulo")!=null
+                    && remoteMessage.getData().get("aviso_mensaje")!=null
+                    && remoteMessage.getData().get("aviso_tipo")!=null){
+
+                showNotification(remoteMessage.getData().get("aviso_titulo"),
+                        remoteMessage.getData().get("aviso_mensaje"),
+                        remoteMessage.getData().get("aviso_tipo"));
+            }
         }
 
         // Check if message contains a notification payload.
@@ -45,7 +54,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    private void showNotification(String preferenceId) {
+    private void showNotification(String titulo, String mensaje, String tipo) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -53,12 +62,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setContentTitle("Id: " + preferenceId)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentText("--")
+                .setContentTitle(titulo)
+                .setContentText(mensaje)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
+
+        switch (tipo){
+            case "promocion":
+                notificationBuilder.setSmallIcon(R.drawable.ic_promocion);
+                break;
+            case "vencimiento":
+                notificationBuilder.setSmallIcon(R.drawable.ic_vencimiento);
+        }
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

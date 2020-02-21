@@ -1,6 +1,4 @@
-package dicont.dicont;
-
-import dicont.dicont.Domain.User;
+package dicont.dicont.Domain;
 
 public class DataUser {
     private static final DataUser ourInstance = new DataUser();

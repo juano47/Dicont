@@ -13,7 +13,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.preference.Preference;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,7 +27,6 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.textfield.TextInputLayout;
@@ -36,15 +34,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mercadopago.android.px.core.MercadoPagoCheckout;
-import com.mercadopago.android.px.model.Item;
-import com.mercadopago.android.px.model.Payment;
-import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 
+import dicont.dicont.Domain.DataUser;
 import dicont.dicont.Domain.Formulario;
 import dicont.dicont.Domain.Monotributo;
 import dicont.dicont.Domain.User;
-
-import static android.app.Activity.RESULT_CANCELED;
 
 /**
  * A simple {@link Fragment} subclass.

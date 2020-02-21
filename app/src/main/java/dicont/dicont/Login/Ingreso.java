@@ -3,7 +3,6 @@ package dicont.dicont.Login;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDialogFragment;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -20,23 +19,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.Serializable;
-
-import dicont.dicont.DataUser;
+import dicont.dicont.Domain.DataUser;
 import dicont.dicont.Domain.User;
 import dicont.dicont.Inicio;
-import dicont.dicont.MainActivity;
 import dicont.dicont.R;
-
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 public class Ingreso extends AppCompatActivity {
 
