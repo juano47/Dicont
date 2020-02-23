@@ -810,7 +810,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
-                    android:layout_marginTop="300dp"
+                    android:layout_marginTop="16dp"
                     android:layout_marginEnd="32dp"
                     android:layout_marginBottom="32dp"
                     android:text="Pagar servicio"
@@ -819,7 +819,51 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/til_formulario_dni" />
+                    app:layout_constraintTop_toBottomOf="@+id/chip_formulario_foto_dni_dorso" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_formiulario_foto_dni_frente"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Foto Dni frente"
+                    app:chipBackgroundColor="#51767A65"
+                    app:layout_constraintStart_toStartOf="@+id/spinner_compania_celular"
+                    app:layout_constraintTop_toBottomOf="@+id/spinner_compania_celular" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_formulario_foto_dni_dorso"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Foto Dni dorso"
+                    app:chipBackgroundColor="#51767A65"
+                    app:layout_constraintStart_toStartOf="@+id/chip_formiulario_foto_dni_frente"
+                    app:layout_constraintTop_toBottomOf="@+id/chip_formiulario_foto_dni_frente" />
+
+                <TextView
+                    android:id="@+id/textView_formulario_foto_dni_frente_info"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:clickable="true"
+                    app:layout_constraintBottom_toBottomOf="@+id/chip_formiulario_foto_dni_frente"
+                    app:layout_constraintEnd_toEndOf="@+id/spinner_compania_celular"
+                    app:layout_constraintStart_toEndOf="@+id/chip_formiulario_foto_dni_frente"
+                    app:layout_constraintTop_toTopOf="@+id/chip_formiulario_foto_dni_frente" />
+
+                <TextView
+                    android:id="@+id/textView_formulario_foto_dni_dorso_info"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/chip_formulario_foto_dni_dorso"
+                    app:layout_constraintEnd_toEndOf="@+id/textView_formulario_foto_dni_frente_info"
+                    app:layout_constraintStart_toStartOf="@+id/textView_formulario_foto_dni_frente_info"
+                    app:layout_constraintTop_toTopOf="@+id/chip_formulario_foto_dni_dorso" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
@@ -841,7 +885,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="45dp"
             android:layout_marginEnd="32dp"
-            android:text="Tu solicitud de monotributo está siendo analizada. En breve recibirás el resultado!"
+            android:text="Tu solicitud de monotributo fue enviada y está siendo analizada por un profesional. En breve recibirás el resultado!"
             android:textAlignment="center"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"

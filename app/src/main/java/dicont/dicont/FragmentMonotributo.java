@@ -4,15 +4,24 @@ package dicont.dicont;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,22 +32,35 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.mercadopago.android.px.core.MercadoPagoCheckout;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import dicont.dicont.Domain.DataUser;
 import dicont.dicont.Domain.Formulario;
 import dicont.dicont.Domain.Monotributo;
 import dicont.dicont.Domain.User;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,6 +68,8 @@ import dicont.dicont.Domain.User;
 public class FragmentMonotributo extends Fragment {
 
     static final int REQUEST_CODE = 1;
+    static final int REQUEST_IMAGE_CAPTURE_DNI_FRENTE = 2;
+    static final int REQUEST_IMAGE_CAPTURE_DNI_DORSO = 3;
 
     final double ingresosBrutosCatA = 208739.25;
     final double ingresosBrutosCatB = 313108.87;
@@ -146,6 +170,8 @@ public class FragmentMonotributo extends Fragment {
     //TextView textViewFormularioCuitCajaProfesionales;
     //TextView textViewFormularioObraSocial;
     //TextView textViewFormularioDomicilioComercial;
+    TextView textViewInfoFotoDniFrente;
+    TextView textViewInfoFotoDniDorso;
 
     CardView cardViewCajaProfesionales;
     CardView cardViewActividadComercial;
@@ -169,6 +195,11 @@ public class FragmentMonotributo extends Fragment {
 
     double ingresoAnual;
     String sexo;
+
+    String currentPhotoPathDniFrente;
+    String currentPhotoPathDniDorso;
+    Boolean validacionFotoDniFrente = false;
+    Boolean validacionFotoDniDorso = false;
 
     private ProgressDialog progressDialog;
 
@@ -279,6 +310,84 @@ public class FragmentMonotributo extends Fragment {
                // editTextFormularioDomicilioComercial = view.findViewById(R.id.editText_formulario_domicilio_comercial);
 
                 final Spinner spinnerCompaniaCelular = view.findViewById(R.id.spinner_compania_celular);
+                Chip chipFormularioFotoDniFrente = view.findViewById(R.id.chip_formiulario_foto_dni_frente);
+                Chip chipFormularioFotoDniDorso = view.findViewById(R.id.chip_formulario_foto_dni_dorso);
+                textViewInfoFotoDniFrente = view.findViewById(R.id.textView_formulario_foto_dni_frente_info);
+                textViewInfoFotoDniDorso = view.findViewById(R.id.textView_formulario_foto_dni_dorso_info);
+
+                chipFormularioFotoDniFrente.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        String imageFileName = "JPEG_" + timeStamp + "_";
+                        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                        File image = null;
+                        try {
+                            image = File.createTempFile(
+                                    imageFileName,  /* prefix */
+                                    ".jpg",         /* suffix */
+                                    storageDir      /* directory */
+                            );
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        //nombre unico que identifica a la foto que se va a capturar
+                        currentPhotoPathDniFrente = image.getAbsolutePath();
+                            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            // Ensure that there's a camera activity to handle the intent
+                            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                                // Create the File where the photo should go
+
+                                // Continue only if the File was successfully created
+                                if (image != null) {
+                                    Uri photoURI = FileProvider.getUriForFile(getContext(),
+                                            "com.example.android.fileprovider",
+                                            image);
+                                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                                    startActivityForResult(takePictureIntent,REQUEST_IMAGE_CAPTURE_DNI_FRENTE);
+                                }
+                            }
+
+                    }
+                });
+
+                chipFormularioFotoDniDorso.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        String imageFileName = "JPEG_" + timeStamp + "_";
+                        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                        File image = null;
+                        try {
+                            image = File.createTempFile(
+                                    imageFileName,  /* prefix */
+                                    ".jpg",         /* suffix */
+                                    storageDir      /* directory */
+                            );
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        //nombre unico que identifica a la foto que se va a capturar
+                        currentPhotoPathDniDorso = image.getAbsolutePath();
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        // Ensure that there's a camera activity to handle the intent
+                        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                            // Create the File where the photo should go
+
+                            // Continue only if the File was successfully created
+                            if (image != null) {
+                                Uri photoURI = FileProvider.getUriForFile(getContext(),
+                                        "com.example.android.fileprovider",
+                                        image);
+                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                                startActivityForResult(takePictureIntent,REQUEST_IMAGE_CAPTURE_DNI_DORSO);
+                            }
+                        }
+
+                    }
+                });
 
                 //Ponemos visible el primer layout y luego va cambiando la visibilidad con la acción de los botones
                 constraintLayoutSinMonotributo.setVisibility(View.VISIBLE);
@@ -305,12 +414,14 @@ public class FragmentMonotributo extends Fragment {
                     @Override
                     public void onClick(View view) {
 
-                        //Datos para instancia "monotributo"
-                        double ingresoAnual = Double.parseDouble(editTextIngresoAnual.getText().toString());
-                        String relacionDependencia = "";
-                        String cajaProfesionales = "";
-                        String actividadComercial = "";
-                        String obraSocial = "";
+                        if (validacionFotoDniFrente&&validacionFotoDniDorso){
+
+                            //Datos para instancia "monotributo"
+                            double ingresoAnual = Double.parseDouble(editTextIngresoAnual.getText().toString());
+                            String relacionDependencia = "";
+                            String cajaProfesionales = "";
+                            String actividadComercial = "";
+                            String obraSocial = "";
 
                             if (chipRelacionDependenciaSI.isChecked()) {
                                 relacionDependencia = "SI";
@@ -326,65 +437,108 @@ public class FragmentMonotributo extends Fragment {
                             }
 
                             if (chipActividadComercialLocacionServicios.isChecked()) {
-                               actividadComercial = "locacion";
+                                actividadComercial = "locacion";
                             } else if (chipActividadComercialVentaMuebles.isChecked()) {
                                 actividadComercial = "venta";
                             }
 
                             if (chipObraSocialSI.isChecked()) {
-                               obraSocial = "SI";
+                                obraSocial = "SI";
                             } else if (chipObraSocialNO.isChecked()) {
                                 obraSocial = "NO";
                             }
 
-                        //creamos y seteamos una instancia de monotributo
-                        Monotributo monotributo = new Monotributo(ingresoAnual, relacionDependencia, cajaProfesionales, obraSocial, actividadComercial, categoria, costoMensualAfipCatMonotributo);
+                            //creamos y seteamos una instancia de monotributo
+                            Monotributo monotributo = new Monotributo(ingresoAnual, relacionDependencia, cajaProfesionales, obraSocial, actividadComercial, categoria, costoMensualAfipCatMonotributo);
 
-                        //Datos para instancia "formulario"
-                        String dni = editTextDni.getText().toString();
-                        String celular = tilFormularioCelular.getEditText().getText().toString();
-                        //Falta tratar el caso de error si no selecciona nada en el spinner
-                        String companiaCelular = spinnerCompaniaCelular.getSelectedItem().toString();
-                        sexo = "";
-                        //Falta tratar el caso de error cuando no se selecciona nada en el radioGroup
+                            //Datos para instancia "formulario"
+                            String dni = editTextDni.getText().toString();
+                            String celular = tilFormularioCelular.getEditText().getText().toString();
+                            //Falta tratar el caso de error si no selecciona nada en el spinner
+                            String companiaCelular = spinnerCompaniaCelular.getSelectedItem().toString();
+                            sexo = "";
+                            //Falta tratar el caso de error cuando no se selecciona nada en el radioGroup
 
-                        if(radioGroupFormularioSexo.getCheckedRadioButtonId() == (R.id.radioButton_femenino)){
-                            sexo = "Femenino";
+                            if(radioGroupFormularioSexo.getCheckedRadioButtonId() == (R.id.radioButton_femenino)){
+                                sexo = "Femenino";
+                            }
+                            else if(radioGroupFormularioSexo.getCheckedRadioButtonId() == (R.id.radioButton_masculino)){
+                                sexo = "Masculino";
+                            }
+
+                            Formulario formulario = new Formulario(dni, sexo, celular, companiaCelular);
+
+                            User user = DataUser.getInstance().getUser();
+
+                            //cambiamos el estado:2 "Iniciar proceso de pago"
+                            //pero primero lo cambiamos a 1 por las dudas ya se haya encontrado en 2 por haberse iniciado un proceso de pago
+                            //anteriormente y no se haya completado. luego al volver a cambiar a 2 nos aseguramos que se activa la function
+                            //correspondiente en firebase
+                            user.setEstado(1);
+                            user.setMonotributo(monotributo);
+                            user.setFormulario(formulario);
+
+                            //volvemos a guardar el user actualizado en el singleton DataUser
+                            DataUser.getInstance().setUser(user);
+
+                            //actualizamos el user en la base de datos
+                            //Initialize Firebase Auth
+                            mAuth = FirebaseAuth.getInstance();
+                            //Initialize Firebase Database
+                            DatabaseReference mDatabase;
+                            mDatabase = FirebaseDatabase.getInstance().getReference();
+                            mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
+
+                            //Además hacemos un doble cambio de la variable para asegurarnos que siempre se activa la funcion correspondiente
+                            //en Firebase functions
+                            user.setEstado(2);
+                            mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
+                            //Toast.makeText(getContext(),"Tu solicitud está siendo analizada por un profesional! Aguarda y verás", Toast.LENGTH_LONG).show();
+
+                            subirFotos();
+
+                            progressDialog.setMessage("Iniciando proceso de pago. Espera unos segundos..");
+                            progressDialog.show();
                         }
-                         else if(String.valueOf(radioGroupFormularioSexo.getCheckedRadioButtonId()).equals(R.id.radioButton_masculino)){
-                             sexo = "Masculino";
-                         }
+                        else if (!validacionFotoDniFrente){
+                            // Crear un builder y vincularlo a la actividad que lo mostrará
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            //Configurar las características
+                            builder
+                                    .setMessage("Hubo un error el tomar la foto del FRENTE de tu dni. Intentalo de nuevo por favor")
+                                    .setIcon(R.drawable.ic_error)
+                                    .setNegativeButton("Aceptar",
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dlgInt, int i) {
+                                                    //para cancelar no hace falta hacer nada, por default se cierra la ventana de dialogo
+                                                }
+                                            });
+                            //Obtener una instancia de cuadro de dialogo
+                            AlertDialog dialog = builder.create();
+                            //Mostrarlo
+                            dialog.show();
+                        }
+                        else {
+                            // Crear un builder y vincularlo a la actividad que lo mostrará
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            //Configurar las características
+                            builder
+                                    .setMessage("Hubo un error al tomar la foto del DORSO de tu dni. Intentalo de nuevo por favor")
+                                    .setIcon(R.drawable.ic_error)
+                                    .setNegativeButton("Aceptar",
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dlgInt, int i) {
+                                                    //para cancelar no hace falta hacer nada, por default se cierra la ventana de dialogo
+                                                }
+                                            });
+                            //Obtener una instancia de cuadro de dialogo
+                            AlertDialog dialog = builder.create();
+                            //Mostrarlo
+                            dialog.show();
+                        }
 
-                        Formulario formulario = new Formulario(dni, sexo, celular, companiaCelular);
-
-                        User user = DataUser.getInstance().getUser();
-
-                        //cambiamos el estado:2 "Iniciar proceso de pago"
-                        //pero primero lo cambiamos a 1 por las dudas ya se haya encontrado en 2 por haberse iniciado un proceso de pago
-                        //anteriormente y no se haya completado. luego al volver a cambiar a 2 nos aseguramos que se activa la function
-                        //correspondiente en firebase
-                        user.setEstado(1);
-                        user.setMonotributo(monotributo);
-                        user.setFormulario(formulario);
-
-                        //volvemos a guardar el user actualizado en el singleton DataUser
-                        DataUser.getInstance().setUser(user);
-
-                        //actualizamos el user en la base de datos
-                        //Initialize Firebase Auth
-                        mAuth = FirebaseAuth.getInstance();
-                        //Initialize Firebase Database
-                        DatabaseReference mDatabase;
-                        mDatabase = FirebaseDatabase.getInstance().getReference();
-                        mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
-
-                        //Además hacemos un doble cambio de la variable para asegurarnos que siempre se activa la funcion correspondiente
-                        //en Firebase functions
-                        user.setEstado(2);
-                        mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
-                        //Toast.makeText(getContext(),"Tu solicitud está siendo analizada por un profesional! Aguarda y verás", Toast.LENGTH_LONG).show();
-                        progressDialog.setMessage("Iniciando proceso de pago. Espera unos segundos..");
-                        progressDialog.show();
                     }
                 });
 
@@ -774,6 +928,75 @@ public class FragmentMonotributo extends Fragment {
 
         }
     };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE_DNI_FRENTE && resultCode == RESULT_OK) {
+            validacionFotoDniFrente = true;
+            textViewInfoFotoDniFrente.setText(currentPhotoPathDniFrente.substring(64));
+        }
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE_DNI_DORSO && resultCode == RESULT_OK) {
+            validacionFotoDniDorso = true;
+            textViewInfoFotoDniDorso.setText(currentPhotoPathDniDorso.substring(64));
+        }
+    }
+
+    void subirFotos (){
+        //crear una instancia de FirebaseStorage
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        // Create a storage reference from our app
+        StorageReference storageRef = storage.getReference();
+        StorageReference carpetaRootRef = storageRef.child("Fotos Dni");
+        StorageReference carpetaUserRef = carpetaRootRef.child(DataUser.getInstance().getUser().getNombre() + " "
+                        + DataUser.getInstance().getUser().getApellido() +" - " +
+                        editTextDni.getText().toString());
+
+        String fileNameFotoDniFrente = "Foto Dni frente " + DataUser.getInstance().getUser().getNombre() + " "
+                + DataUser.getInstance().getUser().getApellido() +" - " + editTextDni.getText().toString()
+                +".jpg";
+        StorageReference refFotoDniFrente = carpetaUserRef.child(fileNameFotoDniFrente);
+
+        File fileDniFrente = new File(currentPhotoPathDniFrente);
+
+        UploadTask uploadTaskDniFrente = refFotoDniFrente.putFile(Uri.fromFile(fileDniFrente));
+
+        uploadTaskDniFrente.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
+        String fileNameFotoDniDorso = "Foto Dni dorso " + DataUser.getInstance().getUser().getNombre() + " "
+                + DataUser.getInstance().getUser().getApellido() +" - " + editTextDni.getText().toString()
+                +".jpg";
+        StorageReference refFotoDniDorso = carpetaUserRef.child(fileNameFotoDniDorso);
+
+
+        File fileDniDorso = new File(currentPhotoPathDniDorso);
+
+        UploadTask uploadTaskDniDorso = refFotoDniDorso.putFile(Uri.fromFile(fileDniDorso));
+
+        uploadTaskDniDorso.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
+    }
 
 
 

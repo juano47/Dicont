@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
-
+/*
     @Override
     protected void onStop(){
         super.onStop();
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             //nos desuscribimos de la referencia para evitar que la app se abra ante cualquier cambio en la base de datos aunque la app este en segundo plano
             estado.removeEventListener(valueEventListener);
         }
-    }
+    }*/
 
     private void updateUI(FirebaseUser currentUser) {
         if (currentUser!=null){
