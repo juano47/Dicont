@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.FileProvider;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -28,6 +29,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -37,6 +39,7 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -61,6 +64,7 @@ import dicont.dicont.Domain.Monotributo;
 import dicont.dicont.Domain.User;
 
 import static android.app.Activity.RESULT_OK;
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -188,6 +192,8 @@ public class FragmentMonotributo extends Fragment {
     Chip chipObraSocialNO;
     Chip chipResumenEleccionMonotributoActividadComercial;
 
+    Spinner spinnerCompaniaCelular;
+
     ScrollView scrollViewEleccionMonotributo;
     ScrollView scrollViewResultadoEleccionMonotributo;
     View dividerInferiorEleccionMonotributo;
@@ -198,8 +204,14 @@ public class FragmentMonotributo extends Fragment {
 
     String currentPhotoPathDniFrente;
     String currentPhotoPathDniDorso;
+
     Boolean validacionFotoDniFrente = false;
     Boolean validacionFotoDniDorso = false;
+    Boolean validacionDni = false;
+    Boolean validacionSexo = false;
+    Boolean validacionNroCel = false;
+    Boolean validacionCompaniaCel = false;
+
 
     private ProgressDialog progressDialog;
 
@@ -309,7 +321,7 @@ public class FragmentMonotributo extends Fragment {
                 //editTextFormularioObraSocial = view.findViewById(R.id.editText_formulario_obra_social);
                // editTextFormularioDomicilioComercial = view.findViewById(R.id.editText_formulario_domicilio_comercial);
 
-                final Spinner spinnerCompaniaCelular = view.findViewById(R.id.spinner_compania_celular);
+                spinnerCompaniaCelular = view.findViewById(R.id.spinner_compania_celular);
                 Chip chipFormularioFotoDniFrente = view.findViewById(R.id.chip_formiulario_foto_dni_frente);
                 Chip chipFormularioFotoDniDorso = view.findViewById(R.id.chip_formulario_foto_dni_dorso);
                 textViewInfoFotoDniFrente = view.findViewById(R.id.textView_formulario_foto_dni_frente_info);
@@ -413,130 +425,129 @@ public class FragmentMonotributo extends Fragment {
                 btnEnviarSolicitudMonotributo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        validarDatos();
+                        if (validacionDni&&validacionSexo&&validacionNroCel&&validacionCompaniaCel) {
+                            if (validacionFotoDniFrente && validacionFotoDniDorso) {
 
-                        if (validacionFotoDniFrente&&validacionFotoDniDorso){
+                                //Datos para instancia "monotributo"
+                                double ingresoAnual = Double.parseDouble(editTextIngresoAnual.getText().toString());
+                                String relacionDependencia = "";
+                                String cajaProfesionales = "";
+                                String actividadComercial = "";
+                                String obraSocial = "";
 
-                            //Datos para instancia "monotributo"
-                            double ingresoAnual = Double.parseDouble(editTextIngresoAnual.getText().toString());
-                            String relacionDependencia = "";
-                            String cajaProfesionales = "";
-                            String actividadComercial = "";
-                            String obraSocial = "";
+                                if (chipRelacionDependenciaSI.isChecked()) {
+                                    relacionDependencia = "SI";
 
-                            if (chipRelacionDependenciaSI.isChecked()) {
-                                relacionDependencia = "SI";
+                                } else if (chipRelacionDependenciaNO.isChecked()) {
+                                    relacionDependencia = "NO";
+                                }
 
-                            } else if (chipRelacionDependenciaNO.isChecked()) {
-                                relacionDependencia = "NO";
+                                if (chipCajaProfesionalesSI.isChecked()) {
+                                    cajaProfesionales = "SI";
+                                } else if (chipCajaProfesionalesNO.isChecked()) {
+                                    cajaProfesionales = "NO";
+                                }
+
+                                if (chipActividadComercialLocacionServicios.isChecked()) {
+                                    actividadComercial = "locacion";
+                                } else if (chipActividadComercialVentaMuebles.isChecked()) {
+                                    actividadComercial = "venta";
+                                }
+
+                                if (chipObraSocialSI.isChecked()) {
+                                    obraSocial = "SI";
+                                } else if (chipObraSocialNO.isChecked()) {
+                                    obraSocial = "NO";
+                                }
+
+                                //creamos y seteamos una instancia de monotributo
+                                Monotributo monotributo = new Monotributo(ingresoAnual, relacionDependencia, cajaProfesionales, obraSocial, actividadComercial, categoria, costoMensualAfipCatMonotributo);
+
+                                //Datos para instancia "formulario"
+                                String dni = editTextDni.getText().toString();
+                                String celular = tilFormularioCelular.getEditText().getText().toString();
+                                //Falta tratar el caso de error si no selecciona nada en el spinner
+                                String companiaCelular = spinnerCompaniaCelular.getSelectedItem().toString();
+                                sexo = "";
+                                if (radioGroupFormularioSexo.getCheckedRadioButtonId() == (R.id.radioButton_femenino)) {
+                                    sexo = "Femenino";
+                                } else if (radioGroupFormularioSexo.getCheckedRadioButtonId() == (R.id.radioButton_masculino)) {
+                                    sexo = "Masculino";
+                                }
+
+                                Formulario formulario = new Formulario(dni, sexo, celular, companiaCelular);
+
+                                User user = DataUser.getInstance().getUser();
+
+                                //cambiamos el estado:2 "Iniciar proceso de pago"
+                                //pero primero lo cambiamos a 1 por las dudas ya se haya encontrado en 2 por haberse iniciado un proceso de pago
+                                //anteriormente y no se haya completado. luego al volver a cambiar a 2 nos aseguramos que se activa la function
+                                //correspondiente en firebase
+                                user.setEstado(1);
+                                user.setMonotributo(monotributo);
+                                user.setFormulario(formulario);
+
+                                //volvemos a guardar el user actualizado en el singleton DataUser
+                                DataUser.getInstance().setUser(user);
+
+                                //actualizamos el user en la base de datos
+                                //Initialize Firebase Auth
+                                mAuth = FirebaseAuth.getInstance();
+                                //Initialize Firebase Database
+                                DatabaseReference mDatabase;
+                                mDatabase = FirebaseDatabase.getInstance().getReference();
+                                mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
+
+                                //Además hacemos un doble cambio de la variable para asegurarnos que siempre se activa la funcion correspondiente
+                                //en Firebase functions
+                                user.setEstado(2);
+                                mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
+                                //Toast.makeText(getContext(),"Tu solicitud está siendo analizada por un profesional! Aguarda y verás", Toast.LENGTH_LONG).show();
+
+                                subirFotos();
+
+                                progressDialog.setMessage("Iniciando proceso de pago. Espera unos segundos..");
+                                progressDialog.show();
+                            } else if (!validacionFotoDniFrente) {
+                                // Crear un builder y vincularlo a la actividad que lo mostrará
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                //Configurar las características
+                                builder
+                                        .setMessage("Hubo un error el tomar la foto del FRENTE de tu dni. Intentalo de nuevo por favor")
+                                        .setIcon(R.drawable.ic_error)
+                                        .setNegativeButton("Aceptar",
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dlgInt, int i) {
+                                                        //para cancelar no hace falta hacer nada, por default se cierra la ventana de dialogo
+                                                    }
+                                                });
+                                //Obtener una instancia de cuadro de dialogo
+                                AlertDialog dialog = builder.create();
+                                //Mostrarlo
+                                dialog.show();
+                            } else {
+                                // Crear un builder y vincularlo a la actividad que lo mostrará
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                //Configurar las características
+                                builder
+                                        .setMessage("Hubo un error al tomar la foto del DORSO de tu dni. Intentalo de nuevo por favor")
+                                        .setIcon(R.drawable.ic_error)
+                                        .setNegativeButton("Aceptar",
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dlgInt, int i) {
+                                                        //para cancelar no hace falta hacer nada, por default se cierra la ventana de dialogo
+                                                    }
+                                                });
+                                //Obtener una instancia de cuadro de dialogo
+                                AlertDialog dialog = builder.create();
+                                //Mostrarlo
+                                dialog.show();
                             }
-
-                            if (chipCajaProfesionalesSI.isChecked()) {
-                                cajaProfesionales = "SI";
-                            } else if (chipCajaProfesionalesNO.isChecked()) {
-                                cajaProfesionales = "NO";
-                            }
-
-                            if (chipActividadComercialLocacionServicios.isChecked()) {
-                                actividadComercial = "locacion";
-                            } else if (chipActividadComercialVentaMuebles.isChecked()) {
-                                actividadComercial = "venta";
-                            }
-
-                            if (chipObraSocialSI.isChecked()) {
-                                obraSocial = "SI";
-                            } else if (chipObraSocialNO.isChecked()) {
-                                obraSocial = "NO";
-                            }
-
-                            //creamos y seteamos una instancia de monotributo
-                            Monotributo monotributo = new Monotributo(ingresoAnual, relacionDependencia, cajaProfesionales, obraSocial, actividadComercial, categoria, costoMensualAfipCatMonotributo);
-
-                            //Datos para instancia "formulario"
-                            String dni = editTextDni.getText().toString();
-                            String celular = tilFormularioCelular.getEditText().getText().toString();
-                            //Falta tratar el caso de error si no selecciona nada en el spinner
-                            String companiaCelular = spinnerCompaniaCelular.getSelectedItem().toString();
-                            sexo = "";
-                            //Falta tratar el caso de error cuando no se selecciona nada en el radioGroup
-
-                            if(radioGroupFormularioSexo.getCheckedRadioButtonId() == (R.id.radioButton_femenino)){
-                                sexo = "Femenino";
-                            }
-                            else if(radioGroupFormularioSexo.getCheckedRadioButtonId() == (R.id.radioButton_masculino)){
-                                sexo = "Masculino";
-                            }
-
-                            Formulario formulario = new Formulario(dni, sexo, celular, companiaCelular);
-
-                            User user = DataUser.getInstance().getUser();
-
-                            //cambiamos el estado:2 "Iniciar proceso de pago"
-                            //pero primero lo cambiamos a 1 por las dudas ya se haya encontrado en 2 por haberse iniciado un proceso de pago
-                            //anteriormente y no se haya completado. luego al volver a cambiar a 2 nos aseguramos que se activa la function
-                            //correspondiente en firebase
-                            user.setEstado(1);
-                            user.setMonotributo(monotributo);
-                            user.setFormulario(formulario);
-
-                            //volvemos a guardar el user actualizado en el singleton DataUser
-                            DataUser.getInstance().setUser(user);
-
-                            //actualizamos el user en la base de datos
-                            //Initialize Firebase Auth
-                            mAuth = FirebaseAuth.getInstance();
-                            //Initialize Firebase Database
-                            DatabaseReference mDatabase;
-                            mDatabase = FirebaseDatabase.getInstance().getReference();
-                            mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
-
-                            //Además hacemos un doble cambio de la variable para asegurarnos que siempre se activa la funcion correspondiente
-                            //en Firebase functions
-                            user.setEstado(2);
-                            mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
-                            //Toast.makeText(getContext(),"Tu solicitud está siendo analizada por un profesional! Aguarda y verás", Toast.LENGTH_LONG).show();
-
-                            subirFotos();
-
-                            progressDialog.setMessage("Iniciando proceso de pago. Espera unos segundos..");
-                            progressDialog.show();
-                        }
-                        else if (!validacionFotoDniFrente){
-                            // Crear un builder y vincularlo a la actividad que lo mostrará
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                            //Configurar las características
-                            builder
-                                    .setMessage("Hubo un error el tomar la foto del FRENTE de tu dni. Intentalo de nuevo por favor")
-                                    .setIcon(R.drawable.ic_error)
-                                    .setNegativeButton("Aceptar",
-                                            new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dlgInt, int i) {
-                                                    //para cancelar no hace falta hacer nada, por default se cierra la ventana de dialogo
-                                                }
-                                            });
-                            //Obtener una instancia de cuadro de dialogo
-                            AlertDialog dialog = builder.create();
-                            //Mostrarlo
-                            dialog.show();
-                        }
-                        else {
-                            // Crear un builder y vincularlo a la actividad que lo mostrará
-                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                            //Configurar las características
-                            builder
-                                    .setMessage("Hubo un error al tomar la foto del DORSO de tu dni. Intentalo de nuevo por favor")
-                                    .setIcon(R.drawable.ic_error)
-                                    .setNegativeButton("Aceptar",
-                                            new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dlgInt, int i) {
-                                                    //para cancelar no hace falta hacer nada, por default se cierra la ventana de dialogo
-                                                }
-                                            });
-                            //Obtener una instancia de cuadro de dialogo
-                            AlertDialog dialog = builder.create();
-                            //Mostrarlo
-                            dialog.show();
+                        } else {
+                            Toast.makeText(getContext(),"Ingreso de datos incorrectos o algún campo vacío", Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -562,10 +573,19 @@ public class FragmentMonotributo extends Fragment {
                     public void afterTextChanged(Editable editable) { }
                 });
 
+               editTextIngresoAnual.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                   @Override
+                   public void onFocusChange(View v, boolean hasFocus) {
+                       if (!hasFocus){
+                           InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                           imm.hideSoftInputFromWindow(editTextIngresoAnual.getWindowToken(), 0);
+                       }
+                   }
+               });
                 chipRelacionDependenciaSI.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                        //cerramos el teclado para que no ocupe espacio -- revisar, no funciona
+                        //cerramos el teclado para que no ocupe espacio
                         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(editTextIngresoAnual.getWindowToken(), 0);
 
@@ -828,6 +848,39 @@ public class FragmentMonotributo extends Fragment {
                     }
                 });
 
+                editTextDni.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            tilFormularioDni.setError(null);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+
+                tilFormularioCelular.getEditText().addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        tilFormularioCelular.setError(null);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
                 break;
             case 3: //Solicitud de monotributo enviada
 
@@ -844,6 +897,39 @@ public class FragmentMonotributo extends Fragment {
                 textViewInfoNombre.setText(user.getNombre());
                 textViewInfoApellido.setText(user.getApellido());
                 break;
+        }
+    }
+
+
+    private void validarDatos() {
+        if (editTextDni.getText().toString().equals("")){
+            validacionDni = false;
+            tilFormularioDni.setError("Completá este dato");
+        }
+        else {
+            validacionDni = true;
+        }
+
+        if (radioGroupFormularioSexo.getCheckedRadioButtonId() != -1){
+            validacionSexo = true;
+        }
+        else {
+            validacionSexo = false;
+        }
+
+        if (tilFormularioCelular.getEditText().getText().toString().equals("")){
+            validacionNroCel = false;
+            tilFormularioCelular.setError("Completá este dato");
+        }
+        else {
+            validacionNroCel = true;
+        }
+
+        if (spinnerCompaniaCelular.getSelectedItem().toString().equals("")){
+            validacionCompaniaCel = false;
+        }
+        else {
+            validacionCompaniaCel = true;
         }
     }
 

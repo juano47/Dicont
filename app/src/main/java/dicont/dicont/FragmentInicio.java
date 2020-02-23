@@ -119,7 +119,7 @@ public class FragmentInicio extends Fragment {
             switch (msg.arg1 ) {
                 case DaoAviso._CONSULTA_AVISO:
                     listaDataSetCompleta = DaoAviso.getInstance().getListaPlatosCompleta();
-                    //solo al momento de tener la lista de platos desde el servidor la seteamos en pantalla
+                    //solo al momento de tener la lista de avisos desde el servidor la seteamos en pantalla
                     listaCompleta.addAll(listaDataSetCompleta);
                     miAdaptadorAviso.notifyDataSetChanged();
                     break;

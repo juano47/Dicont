@@ -84,7 +84,6 @@ public class Inicio extends AppCompatActivity {
                                     }
                                 });
 
-
                 //Obtener una instancia de cuadro de dialogo
                 AlertDialog dialog = builder.create();
                 //Mostrarlo
