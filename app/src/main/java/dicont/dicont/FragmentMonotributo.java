@@ -514,7 +514,7 @@ public class FragmentMonotributo extends Fragment {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                                 //Configurar las características
                                 builder
-                                        .setMessage("Hubo un error el tomar la foto del FRENTE de tu dni. Intentalo de nuevo por favor")
+                                        .setMessage("Hubo un error al tomar la foto del FRENTE de tu dni. Intentalo de nuevo por favor")
                                         .setIcon(R.drawable.ic_error)
                                         .setNegativeButton("Aceptar",
                                                 new DialogInterface.OnClickListener() {

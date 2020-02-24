@@ -27,6 +27,7 @@ import dicont.dicont.DAO.ROOM.DBActividad;
 import dicont.dicont.Domain.Actividad;
 import dicont.dicont.Domain.DataUser;
 import dicont.dicont.Domain.User;
+import dicont.dicont.Login.Ingreso;
 import dicont.dicont.ui.main.SectionsPagerAdapter;
 
 import static dicont.dicont.FragmentMonotributo.REQUEST_CODE;
@@ -42,6 +43,8 @@ public class Inicio extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+
+        getSupportActionBar().setSubtitle("Hola " + DataUser.getInstance().getUser().getNombre());
     }
 
     @Override
@@ -101,7 +104,8 @@ public class Inicio extends AppCompatActivity {
         Log.e("Avance", "entra al onActivityResult");
         if (requestCode == REQUEST_CODE) {
             if (resultCode == MercadoPagoCheckout.PAYMENT_RESULT_CODE) {
-                onBackPressed();
+                Intent intent = new Intent(Inicio.this, Ingreso.class);
+                startActivity(intent);
                 final Payment payment = (Payment) data.getSerializableExtra(MercadoPagoCheckout.EXTRA_PAYMENT_RESULT);
                 Log.e("paymentStatus", payment.getPaymentStatus());
                 switch(payment.getPaymentStatus()){
@@ -134,6 +138,7 @@ public class Inicio extends AppCompatActivity {
                         GuardarActividad tareaGuardarActividad2 = new GuardarActividad();
                         tareaGuardarActividad2.execute(actividad2);
                         break;
+
                 }
 
             } else if (resultCode == RESULT_CANCELED) {

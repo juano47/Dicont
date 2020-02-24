@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import dicont.dicont.Domain.DataUser;
 import dicont.dicont.Domain.User;
 import dicont.dicont.Inicio;
+import dicont.dicont.MainActivity;
 import dicont.dicont.R;
 
 public class Ingreso extends AppCompatActivity {
@@ -79,8 +80,6 @@ public class Ingreso extends AppCompatActivity {
                             if(mAuth.getCurrentUser().isEmailVerified()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d("", "signInWithEmail:success");
-                                Toast.makeText(Ingreso.this, "Ingreso exitoso", Toast.LENGTH_SHORT).show();
-
                                 /*
                                 Si el estado está en 0: actualizamos emailVerificado y cambiamos el estado a 1
                                 Si el estado es distinto de 0: no hacemos nada
@@ -139,7 +138,7 @@ public class Ingreso extends AppCompatActivity {
                                 progressDialog.dismiss();
                                 // Si el usuario no verificó su correo
                                 Log.w("", "signInWithEmail:failure", task.getException());
-                                Toast.makeText(Ingreso.this, "Verificar correo", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Ingreso.this, "Verifica tu correo para poder ingresar", Toast.LENGTH_SHORT).show();
                                 //Traducir y poner en un AlertDialog los mensajes de task.getException().getMessage()
                             }
                         } else {
@@ -183,7 +182,6 @@ public class Ingreso extends AppCompatActivity {
                                 AlertDialog dialog = builder.create();
                                 //Mostrarlo
                                 dialog.show();
-                            Toast.makeText(Ingreso.this, "An email has been sent to you.", Toast.LENGTH_SHORT).show();
 
                         } else {
                                 Toast.makeText(Ingreso.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();

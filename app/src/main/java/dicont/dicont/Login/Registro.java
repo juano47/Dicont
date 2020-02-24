@@ -96,6 +96,8 @@ public class Registro extends AppCompatActivity {
 
                                         Toast.makeText(Registro.this, "Se creo el usuario en la base de datos!", Toast.LENGTH_SHORT).show();
 
+                                        Intent i = new Intent(Registro.this, Ingreso.class);
+                                        startActivity(i);
 
                                     }else{
                                         Toast.makeText(Registro.this, "El envió del email de verificación falló!", Toast.LENGTH_SHORT).show();

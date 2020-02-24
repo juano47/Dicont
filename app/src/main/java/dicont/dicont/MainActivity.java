@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
     private void updateUI(FirebaseUser currentUser) {
         if (currentUser!=null){
             if(currentUser.isEmailVerified()) {
-                Toast.makeText(MainActivity.this, currentUser.getEmail() + " - Usuario verificado: " + currentUser.isEmailVerified(), Toast.LENGTH_SHORT).show();
                 progressDialog.setMessage("Espera unos instantes..");
                 progressDialog.show();
 
@@ -149,16 +148,13 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("Error!","onCancelled");
                     }
                 });
-
-
-
             }
             else {
                 //Si el usuario no verificó su correo
                 textViewIngreso.setVisibility(View.VISIBLE);
                 btnIngresar.setVisibility(View.VISIBLE);
                 btnRegistrarse.setVisibility(View.VISIBLE);
-                Toast.makeText(MainActivity.this, "Fallo - correo no verificado", Toast.LENGTH_SHORT).show();
+
             }
 
         } else {
@@ -166,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
             textViewIngreso.setVisibility(View.VISIBLE);
             btnIngresar.setVisibility(View.VISIBLE);
             btnRegistrarse.setVisibility(View.VISIBLE);
-            Toast.makeText(MainActivity.this, "Usuario no logueado", Toast.LENGTH_SHORT).show();
         }
     }
 

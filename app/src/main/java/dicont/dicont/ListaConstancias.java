@@ -4,7 +4,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.service.autofill.UserData;
 import android.view.MenuItem;
+
+import dicont.dicont.Domain.DataUser;
 
 public class ListaConstancias extends AppCompatActivity {
 
@@ -16,6 +19,7 @@ public class ListaConstancias extends AppCompatActivity {
         //define la flecha para volver en la actionBar
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setSubtitle("Hola " + DataUser.getInstance().getUser().getNombre());
     }
 
     //flecha volver en la actionbar
