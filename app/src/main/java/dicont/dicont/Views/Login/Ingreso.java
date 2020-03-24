@@ -23,6 +23,17 @@ import dicont.dicont.Controller.IngresoController;
 import dicont.dicont.Views.Inicio;
 import dicont.dicont.R;
 
+/*Incluye:
+2 acciones (dos botones):
+                        - LoginUser
+                        - RestablecerClave
+
+Interfaz usada por el controlador IngresoController:
+                                                    - onResultLoginUser
+                                                    - onResultRestablecerClave
+                                                    - showMessageError
+ */
+
 public class Ingreso extends AppCompatActivity{
 
     TextInputLayout tilEmail;
@@ -31,9 +42,8 @@ public class Ingreso extends AppCompatActivity{
     EditText editTextEmail;
     EditText editTextContraseña;
 
-    Button btnConfirmarIngreso;
+    Button btnLoginUser;
     Button btnRestablecerClave;
-
 
     private ProgressDialog progressDialog;
 
@@ -41,19 +51,21 @@ public class Ingreso extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ingreso);
+        //asignamos la interfaz correspondiente al controlador por única vez
+        IngresoController.getInstance().setmCallbackIngreso(callbackInterface);
 
         //find view
         tilEmail = findViewById(R.id.til_email);
         tilContraseña = findViewById(R.id.til_contraseña);
         editTextEmail = findViewById(R.id.edit_text_email);
         editTextContraseña = findViewById(R.id.edi_text_contraseña);
-        btnConfirmarIngreso = findViewById(R.id.button_confirmar_ingreso);
+        btnLoginUser = findViewById(R.id.button_confirmar_ingreso);
         btnRestablecerClave = findViewById(R.id.button_restablecer_clave);
 
         progressDialog= new ProgressDialog(this);
 
         //set listener
-        btnConfirmarIngreso.setOnClickListener(new View.OnClickListener() {
+        btnLoginUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String email = editTextEmail.getText().toString();
@@ -62,7 +74,6 @@ public class Ingreso extends AppCompatActivity{
                 progressDialog.setMessage("Autenticando");
                 progressDialog.show();
 
-                IngresoController.getInstance().setmCallbackIngreso(callbackInterface);
                 IngresoController.getInstance().loginUser(email, pass);
             }
         });
@@ -71,36 +82,9 @@ public class Ingreso extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 String email = editTextEmail.getText().toString();
-
-                FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-
-                            if (task.isSuccessful()) {
-                                // Crear un builder y vincularlo a la actividad que lo mostrará
-                                AlertDialog.Builder builder = new AlertDialog.Builder(Ingreso.this);
-                                //Configurar las características
-                                builder.setMessage("Te hemos enviado un correo electrónico (Revisar spam)")
-                                        .setTitle("Restablecimiento de contraseña")
-                                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener(){
-
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                //no hace falta hacer nada, solo mostramos un mensaje.
-                                            }
-                                        });
-                                //Obtener una instancia de cuadro de dialogo
-                                AlertDialog dialog = builder.create();
-                                //Mostrarlo
-                                dialog.show();
-
-                        } else {
-                                Toast.makeText(Ingreso.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                //Traducir y poner en un AlertDialog los mensajes de task.getException().getMessage()
-                        }
-                    }
-                });
+                progressDialog.setMessage("Espera..");
+                progressDialog.show();
+                IngresoController.getInstance().restablecerClave(email);
             }
         });
     }
@@ -108,11 +92,16 @@ public class Ingreso extends AppCompatActivity{
     public interface CallbackInterfaceIngreso {
         void onResultLoginUser();
         void showMessageError(String message);
+        void onResultRestablecerClave();
     }
+
     private CallbackInterfaceIngreso callbackInterface = new CallbackInterfaceIngreso() {
+
         @Override
-        public void onResultLoginUser(){
+        public void onResultLoginUser(){  //Resultado exitoso. Caso contrario vuelve por showMessageError
+
             progressDialog.dismiss();
+            //Único punto de acceso a la app desde esta clase
             Intent i = new Intent(Ingreso.this, Inicio.class);
             startActivity(i);
         }
@@ -121,6 +110,29 @@ public class Ingreso extends AppCompatActivity{
         public void showMessageError(String message){
             progressDialog.dismiss();
             Toast.makeText(Ingreso.this, message, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onResultRestablecerClave() { //Resultado exitoso. Caso contrario vuelve por showMessageError
+
+            progressDialog.dismiss();
+
+            // Crear un builder y vincularlo a la actividad que lo mostrará
+            AlertDialog.Builder builder = new AlertDialog.Builder(Ingreso.this);
+            //Configurar las características
+            builder.setMessage("Te hemos enviado un correo electrónico (Revisar spam)")
+                    .setTitle("Restablecimiento de contraseña")
+                    .setPositiveButton("Aceptar", new DialogInterface.OnClickListener(){
+
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            //no hace falta hacer nada, solo mostramos un mensaje.
+                        }
+                    });
+            //Obtener una instancia de cuadro de dialogo
+            AlertDialog dialog = builder.create();
+            //Mostrarlo
+            dialog.show();
         }
     };
 

@@ -45,17 +45,22 @@ public class IngresoController{
         mCallbackIngreso.onResultLoginUser();
     }
 
+    public void restablecerClave(String email) {
+        UserRepository.getInstance().restablecerClave(email);
+    }
+
     public interface CallbackInterfaceUserDatabaseFirebase {
-        void onResultValidarUser(Boolean result);
+        void onResultValidarUser(boolean result);
         void onResultGetUser(User user);
         void onResultUpdateUser(User user);
         void showMessageError(String message);
+        void onResultRestablecerClave(boolean result);
     }
 
     private CallbackInterfaceUserDatabaseFirebase callbackInterfaceUserDatabaseFirebase = new CallbackInterfaceUserDatabaseFirebase() {
 
         @Override
-        public void onResultValidarUser(Boolean result){
+        public void onResultValidarUser(boolean result){
             if (result){
                 if (UserRepository.getInstance().checkearEmailVerificado()){
                     Log.e("if 1 loginUser", "entra");
@@ -77,7 +82,7 @@ public class IngresoController{
             if (user.getEstado()==0) {
                 user.setEstado(1);
                 UserRepository.getInstance().updateUser(user);
-                //continúa en el método onResultUpdateUser
+                //continúa en el método onResultUpdateUser o showMessageError
 
             } else {
                 ingresoExitoso(user);
@@ -92,6 +97,15 @@ public class IngresoController{
         @Override
         public void showMessageError(String message) {
             mCallbackIngreso.showMessageError(message);
+        }
+
+        @Override
+        public void onResultRestablecerClave(boolean result) {
+            if (result){
+                mCallbackIngreso.onResultRestablecerClave();
+            } else {
+                mCallbackIngreso.showMessageError("No tenemos un usuario registrado con ese correo. Intenta de nuevo o prueba registrarte sino lo has hecho");
+            }
         }
     };
 }

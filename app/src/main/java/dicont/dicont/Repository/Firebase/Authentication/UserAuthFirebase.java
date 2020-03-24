@@ -50,4 +50,20 @@ public class UserAuthFirebase {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         return mAuth.getCurrentUser().isEmailVerified();
     }
+
+    public void restablecerClave(String email) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if (task.isSuccessful()) {
+                    mCallbackIngresoController.onResultRestablecerClave(true);
+
+                } else {
+                    mCallbackIngresoController.onResultRestablecerClave(false);
+                }
+            }
+        });
+    }
 }

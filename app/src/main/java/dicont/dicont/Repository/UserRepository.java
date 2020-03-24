@@ -33,4 +33,8 @@ public class UserRepository {
     public void updateUser(User user) {
         UserDatabaseFirebase.getInstance().updateUser(user);
     }
+
+    public void restablecerClave(String email) {
+        UserAuthFirebase.getInstance().restablecerClave(email);
+    }
 }
