@@ -1,9 +1,7 @@
 package dicont.dicont.Views.Login;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Entity;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -14,10 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.FirebaseAuth;
 
 import dicont.dicont.Controller.IngresoController;
 import dicont.dicont.Views.Inicio;
@@ -52,7 +47,9 @@ public class Ingreso extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ingreso);
         //asignamos la interfaz correspondiente al controlador por única vez
-        IngresoController.getInstance().setmCallbackIngreso(callbackInterface);
+        IngresoController.getInstance().setmCallbackIngreso(callbackInterfaceIngreso);
+
+        progressDialog= new ProgressDialog(this);
 
         //find view
         tilEmail = findViewById(R.id.til_email);
@@ -61,8 +58,6 @@ public class Ingreso extends AppCompatActivity{
         editTextContraseña = findViewById(R.id.edi_text_contraseña);
         btnLoginUser = findViewById(R.id.button_confirmar_ingreso);
         btnRestablecerClave = findViewById(R.id.button_restablecer_clave);
-
-        progressDialog= new ProgressDialog(this);
 
         //set listener
         btnLoginUser.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +90,7 @@ public class Ingreso extends AppCompatActivity{
         void onResultRestablecerClave();
     }
 
-    private CallbackInterfaceIngreso callbackInterface = new CallbackInterfaceIngreso() {
+    private CallbackInterfaceIngreso callbackInterfaceIngreso = new CallbackInterfaceIngreso() {
 
         @Override
         public void onResultLoginUser(){  //Resultado exitoso. Caso contrario vuelve por showMessageError

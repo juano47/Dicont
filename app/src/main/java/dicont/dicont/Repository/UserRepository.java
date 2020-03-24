@@ -1,6 +1,5 @@
 package dicont.dicont.Repository;
 
-import dicont.dicont.Controller.IngresoController;
 import dicont.dicont.Model.User;
 import dicont.dicont.Repository.Firebase.Authentication.UserAuthFirebase;
 import dicont.dicont.Repository.Firebase.Database.UserDatabaseFirebase;
@@ -36,5 +35,17 @@ public class UserRepository {
 
     public void restablecerClave(String email) {
         UserAuthFirebase.getInstance().restablecerClave(email);
+    }
+
+    public void userRegister(String email, String clave) {
+        UserAuthFirebase.getInstance().userRegister(email, clave);
+    }
+
+    public void sendEmailVerification() {
+        UserAuthFirebase.getInstance().sendEmailVerification();
+    }
+
+    public void crearUser(String nombre, String apellido, String email) {
+        UserDatabaseFirebase.getInstance().crearUser(nombre, apellido, email);
     }
 }

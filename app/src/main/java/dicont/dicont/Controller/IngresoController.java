@@ -8,8 +8,9 @@ import dicont.dicont.Repository.Firebase.Authentication.UserAuthFirebase;
 import dicont.dicont.Repository.Firebase.Database.UserDatabaseFirebase;
 import dicont.dicont.Repository.UserRepository;
 import dicont.dicont.Views.Login.Ingreso;
+import dicont.dicont.Views.Login.Registro;
 
-public class IngresoController{
+public class IngresoController {
 
     private static IngresoController ourInstance;
 
@@ -24,8 +25,8 @@ public class IngresoController{
 
     private IngresoController() {
         //seteamos la interfaz de comunicacion con UserDatabaseFirebase y UserAuthFirebase por única vez
-        UserAuthFirebase.getInstance().setmCallbackIngresoController(callbackInterfaceUserDatabaseFirebase);
-        UserDatabaseFirebase.getInstance().setmCallbackIngresoController(callbackInterfaceUserDatabaseFirebase);
+        UserAuthFirebase.getInstance().setmCallbackIngresoController(callbackInterfaceIngresoController);
+        UserDatabaseFirebase.getInstance().setmCallbackIngresoController(callbackInterfaceIngresoController);
     }
 
     public void setmCallbackIngreso (Ingreso.CallbackInterfaceIngreso mCallbackIngreso){
@@ -35,7 +36,7 @@ public class IngresoController{
     public void loginUser(String email, String pass) {
         //primero verificamos si los datos son correctos. Se hace usando el servicio de Firebase Auth
         UserRepository.getInstance().validarUser(email, pass);
-        //Continua en
+        //Continua en onResultValidarUser
     }
 
     private void ingresoExitoso(User user){
@@ -45,11 +46,14 @@ public class IngresoController{
         mCallbackIngreso.onResultLoginUser();
     }
 
-    public void restablecerClave(String email) {
+    public void restablecerClave(String email) {        //sigue en onResultRegisterUser o showMessageError
         UserRepository.getInstance().restablecerClave(email);
     }
 
-    public interface CallbackInterfaceUserDatabaseFirebase {
+
+
+    public interface CallbackInterfaceIngresoController {
+        //Métodos para Ingreso
         void onResultValidarUser(boolean result);
         void onResultGetUser(User user);
         void onResultUpdateUser(User user);
@@ -57,7 +61,7 @@ public class IngresoController{
         void onResultRestablecerClave(boolean result);
     }
 
-    private CallbackInterfaceUserDatabaseFirebase callbackInterfaceUserDatabaseFirebase = new CallbackInterfaceUserDatabaseFirebase() {
+    private CallbackInterfaceIngresoController callbackInterfaceIngresoController = new CallbackInterfaceIngresoController() {
 
         @Override
         public void onResultValidarUser(boolean result){
@@ -73,7 +77,6 @@ public class IngresoController{
             }else {
                 mCallbackIngreso.showMessageError("Los datos ingresados no son correctos");
             }
-
         }
 
         @Override
@@ -83,7 +86,6 @@ public class IngresoController{
                 user.setEstado(1);
                 UserRepository.getInstance().updateUser(user);
                 //continúa en el método onResultUpdateUser o showMessageError
-
             } else {
                 ingresoExitoso(user);
             }

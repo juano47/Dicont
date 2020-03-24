@@ -1,6 +1,5 @@
 package dicont.dicont.Repository.Firebase.Database;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -13,13 +12,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import dicont.dicont.Controller.IngresoController;
+import dicont.dicont.Controller.RegistroController;
 import dicont.dicont.Model.User;
+import dicont.dicont.Views.Login.Registro;
 
 public class UserDatabaseFirebase {
 
     private static UserDatabaseFirebase ourInstance;
 
-    private IngresoController.CallbackInterfaceUserDatabaseFirebase mCallbackIngresoController;
+    private IngresoController.CallbackInterfaceIngresoController mCallbackIngresoController;
+    private RegistroController.CallbackInterfaceRegistroController mCallbackRegistroController;
 
     public static UserDatabaseFirebase getInstance() {
         if (ourInstance == null){
@@ -31,8 +33,12 @@ public class UserDatabaseFirebase {
     private UserDatabaseFirebase() {
     }
 
-    public void setmCallbackIngresoController (IngresoController.CallbackInterfaceUserDatabaseFirebase mCallbackIngresoController){
+    public void setmCallbackIngresoController (IngresoController.CallbackInterfaceIngresoController mCallbackIngresoController){
         ourInstance.mCallbackIngresoController = mCallbackIngresoController;
+    }
+
+    public void setmCallbackRegistroController(RegistroController.CallbackInterfaceRegistroController mCallbackRegistroController) {
+        ourInstance.mCallbackRegistroController = mCallbackRegistroController;
     }
 
 
@@ -77,10 +83,30 @@ public class UserDatabaseFirebase {
 
             mCallbackIngresoController.onResultUpdateUser(user);
         } catch (Exception e){
-            mCallbackIngresoController.showMessageError("Hubo un error al acceder. Intentalo de nuevo");
+            mCallbackIngresoController.showMessageError("Hubo un error al actualizar el usuario en la base de datos");
+            //Falta la lógica para este error!
         }
-
     }
 
+    public void crearUser(String nombre, String apellido, String email) {
+        try {
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            DatabaseReference mDatabase;
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            String userID = mAuth.getCurrentUser().getUid();
+            User user = new User();
+            user.setNombre(nombre);
+            user.setApellido(apellido);
+            user.setEmail(email);
+            user.setEstado(0);
+            mDatabase.child("Users").child(userID).setValue(user);
 
+            mCallbackRegistroController.onResultCrearUser();
+        }catch (Exception e){
+            mCallbackRegistroController.showMessageError("Hubo un error al guardar el usuario en la base de datos");
+            //Falta la lógica para este error!
+        }
+
+
+    }
 }
