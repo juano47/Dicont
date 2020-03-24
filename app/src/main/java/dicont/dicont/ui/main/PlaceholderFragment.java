@@ -5,14 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
-import dicont.dicont.FragmentInicio;
-import dicont.dicont.FragmentMonotributo;
+import dicont.dicont.Views.FragmentInicio;
+import dicont.dicont.Views.FragmentMonotributo;
 import dicont.dicont.R;
 
 /**

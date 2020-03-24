@@ -1,13 +1,11 @@
-package dicont.dicont.DAO.Firebase.Database;
+package dicont.dicont.Repository.Firebase.Database;
 
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -15,37 +13,29 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import dicont.dicont.Domain.Aviso;
-import dicont.dicont.Domain.DataUser;
-import dicont.dicont.Domain.User;
-import dicont.dicont.Inicio;
-import dicont.dicont.MainActivity;
-import retrofit2.Call;
+import dicont.dicont.Model.Aviso;
 
 
-public class DaoAviso {
+public class AvisoDatabaseFirebase {
     public static final int _CONSULTA_AVISO =10;
 
     public static final int _ERROR_AVISO =-1;
 
 
-    private ArrayList<Aviso> listaPlatosCompleta;
-    private FirebaseAuth mAuth;
+    private ArrayList<Aviso> listaAvisosCompleta;
     private ValueEventListener valueEventListener;
-    Aviso aviso;
 
-    private static final DaoAviso ourInstance = new DaoAviso();
+    private static final AvisoDatabaseFirebase ourInstance = new AvisoDatabaseFirebase();
 
-    public static DaoAviso getInstance() {
+    public static AvisoDatabaseFirebase getInstance() {
         return ourInstance;
     }
 
-    private DaoAviso() {
+    private AvisoDatabaseFirebase() {
     }
 
-    public void listarPlatos(final Handler h) {
+    public void listarAvisos(final Handler h) {
 
         //obtenemos una referencia al usuario actual
         DatabaseReference avisos =
@@ -60,9 +50,9 @@ public class DaoAviso {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    listaPlatosCompleta = new ArrayList<Aviso>();
+                    listaAvisosCompleta = new ArrayList<Aviso>();
                     for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                        listaPlatosCompleta.add(postSnapshot.getValue(Aviso.class));
+                        listaAvisosCompleta.add(postSnapshot.getValue(Aviso.class));
                     }
                     Message m = new Message();
                     m.arg1 = _CONSULTA_AVISO;
@@ -82,5 +72,5 @@ public class DaoAviso {
         });
     }
 
-    public ArrayList<Aviso> getListaPlatosCompleta() { return listaPlatosCompleta; }
+    public ArrayList<Aviso> getListaPlatosCompleta() { return listaAvisosCompleta; }
 }

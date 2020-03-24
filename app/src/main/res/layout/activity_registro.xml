@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Login.Registro">
+    tools:context=".Views.Login.Registro">
 
     <TextView
         android:id="@+id/textView2"
@@ -35,7 +35,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="E-mail"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:singleLine="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -54,7 +55,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Clave"
-            android:inputType="textPassword"/>
+            android:inputType="textPassword"
+            android:singleLine="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
@@ -84,7 +86,8 @@
             android:id="@+id/edit_text_registro_nombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nombre" />
+            android:hint="Nombre"
+            android:singleLine="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -102,7 +105,8 @@
             android:id="@+id/edit_text_registro_apellido"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Apellido" />
+            android:hint="Apellido"
+            android:singleLine="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

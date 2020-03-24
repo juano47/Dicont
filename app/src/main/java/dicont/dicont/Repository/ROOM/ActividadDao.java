@@ -1,4 +1,4 @@
-package dicont.dicont.DAO.ROOM;
+package dicont.dicont.Repository.ROOM;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -8,8 +8,7 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import dicont.dicont.Domain.Actividad;
-import dicont.dicont.Domain.Aviso;
+import dicont.dicont.Model.Actividad;
 
 @Dao
 public interface ActividadDao {

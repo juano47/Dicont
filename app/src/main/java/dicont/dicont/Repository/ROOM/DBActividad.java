@@ -1,4 +1,4 @@
-package dicont.dicont.DAO.ROOM;
+package dicont.dicont.Repository.ROOM;
 
 import android.content.Context;
 
@@ -11,7 +11,7 @@ public class DBActividad {
 
     private DBActividad(Context ctx){
         dicontDB = Room.databaseBuilder(ctx,
-                dicont.dicont.DAO.ROOM.DicontDB.class, "dicont-db").allowMainThreadQueries().build();
+                dicont.dicont.Repository.ROOM.DicontDB.class, "dicont-db").allowMainThreadQueries().build();
     }
 
     public synchronized static DBActividad getInstance(Context ctx){
@@ -21,7 +21,7 @@ public class DBActividad {
         return DB;
     }
 
-    public dicont.dicont.DAO.ROOM.DicontDB getDicontDB() {
+    public dicont.dicont.Repository.ROOM.DicontDB getDicontDB() {
         return dicontDB;
     }
 }

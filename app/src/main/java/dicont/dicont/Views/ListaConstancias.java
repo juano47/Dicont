@@ -1,13 +1,13 @@
-package dicont.dicont;
+package dicont.dicont.Views;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.service.autofill.UserData;
 import android.view.MenuItem;
 
-import dicont.dicont.Domain.DataUser;
+import dicont.dicont.Model.DataUser;
+import dicont.dicont.R;
 
 public class ListaConstancias extends AppCompatActivity {
 

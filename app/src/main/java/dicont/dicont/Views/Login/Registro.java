@@ -1,11 +1,10 @@
-package dicont.dicont.Login;
+package dicont.dicont.Views.Login;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,7 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import dicont.dicont.Domain.User;
+import dicont.dicont.Model.User;
 import dicont.dicont.R;
 
 public class Registro extends AppCompatActivity {
@@ -91,7 +90,6 @@ public class Registro extends AppCompatActivity {
                                         user.setApellido(apellido);
                                         user.setEmail(email);
                                         user.setEstado(0);
-                                        user.setEmailVerificado(emailVerificado);
                                         mDatabase.child("Users").child(userID).setValue(user);
 
                                         Toast.makeText(Registro.this, "Se creo el usuario en la base de datos!", Toast.LENGTH_SHORT).show();

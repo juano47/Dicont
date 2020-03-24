@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
-import dicont.dicont.Domain.Aviso;
+import dicont.dicont.Model.Aviso;
 
 
 public class AdaptadorItemAviso extends RecyclerView.Adapter<AdaptadorItemAviso.ItemViewHolder>{

@@ -13,14 +13,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ListaConstancias"></activity>
+        <activity android:name=".Views.ListaConstancias"></activity>
         <activity
-            android:name=".Inicio"
+            android:name=".Views.Inicio"
 
              />
-        <activity android:name=".Login.Registro" />
-        <activity android:name=".Login.Ingreso" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".Views.Login.Registro" />
+        <activity android:name=".Views.Login.Ingreso" />
+        <activity android:name=".Views.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

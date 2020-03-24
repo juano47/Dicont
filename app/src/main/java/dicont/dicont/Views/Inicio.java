@@ -1,4 +1,4 @@
-package dicont.dicont;
+package dicont.dicont.Views;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,19 +18,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.util.Date;
 
-import dicont.dicont.DAO.ROOM.ActividadDao;
-import dicont.dicont.DAO.ROOM.DBActividad;
-import dicont.dicont.Domain.Actividad;
-import dicont.dicont.Domain.DataUser;
-import dicont.dicont.Domain.User;
-import dicont.dicont.Login.Ingreso;
+import dicont.dicont.Repository.ROOM.ActividadDao;
+import dicont.dicont.Repository.ROOM.DBActividad;
+import dicont.dicont.Model.Actividad;
+import dicont.dicont.Model.DataUser;
+import dicont.dicont.Model.User;
+import dicont.dicont.Views.Login.Ingreso;
+import dicont.dicont.R;
 import dicont.dicont.ui.main.SectionsPagerAdapter;
 
-import static dicont.dicont.FragmentMonotributo.REQUEST_CODE;
+import static dicont.dicont.Views.FragmentMonotributo.REQUEST_CODE;
 
 public class Inicio extends AppCompatActivity {
 

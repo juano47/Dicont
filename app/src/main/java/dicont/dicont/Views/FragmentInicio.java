@@ -1,10 +1,8 @@
-package dicont.dicont;
+package dicont.dicont.Views;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,19 +14,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TableRow;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import dicont.dicont.DAO.Firebase.Database.DaoAviso;
-import dicont.dicont.DAO.ROOM.ActividadDao;
-import dicont.dicont.DAO.ROOM.DBActividad;
-import dicont.dicont.Domain.Actividad;
-import dicont.dicont.Domain.Aviso;
+import dicont.dicont.AdaptadorItemActividad;
+import dicont.dicont.AdaptadorItemAviso;
+import dicont.dicont.Repository.Firebase.Database.AvisoDatabaseFirebase;
+import dicont.dicont.Repository.ROOM.ActividadDao;
+import dicont.dicont.Repository.ROOM.DBActividad;
+import dicont.dicont.Model.Actividad;
+import dicont.dicont.Model.Aviso;
+import dicont.dicont.R;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -56,7 +56,7 @@ public class FragmentInicio extends Fragment {
 
         ////AVISOS obtenidos desde Firebase////
         //solicitamos la lista de avisos guardada en la base de datos
-        DaoAviso.getInstance().listarPlatos(miHandler);
+        AvisoDatabaseFirebase.getInstance().listarAvisos(miHandler);
 
         //getting the recyclerview from xml
         mRecyclerViewAvisos = view.findViewById(R.id.recyclerView_avisos);
@@ -117,13 +117,13 @@ public class FragmentInicio extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.arg1 ) {
-                case DaoAviso._CONSULTA_AVISO:
-                    listaDataSetCompleta = DaoAviso.getInstance().getListaPlatosCompleta();
+                case AvisoDatabaseFirebase._CONSULTA_AVISO:
+                    listaDataSetCompleta = AvisoDatabaseFirebase.getInstance().getListaPlatosCompleta();
                     //solo al momento de tener la lista de avisos desde el servidor la seteamos en pantalla
                     listaCompleta.addAll(listaDataSetCompleta);
                     miAdaptadorAviso.notifyDataSetChanged();
                     break;
-                case DaoAviso._ERROR_AVISO:
+                case AvisoDatabaseFirebase._ERROR_AVISO:
                     Log.e("", "Error al solicitar los avisos de la base de datos");
                     break;
             }

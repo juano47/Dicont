@@ -1,4 +1,4 @@
-package dicont.dicont;
+package dicont.dicont.Views;
 
 
 import android.app.ProgressDialog;
@@ -7,9 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,7 +15,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.FileProvider;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -29,12 +26,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -58,13 +53,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import dicont.dicont.Domain.DataUser;
-import dicont.dicont.Domain.Formulario;
-import dicont.dicont.Domain.Monotributo;
-import dicont.dicont.Domain.User;
+import dicont.dicont.Model.DataUser;
+import dicont.dicont.Model.Formulario;
+import dicont.dicont.Model.Monotributo;
+import dicont.dicont.Model.User;
+import dicont.dicont.R;
 
 import static android.app.Activity.RESULT_OK;
-import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 /**
  * A simple {@link Fragment} subclass.

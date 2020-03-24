@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import dicont.dicont.Domain.Actividad;
+import dicont.dicont.Model.Actividad;
 
 public class AdaptadorItemActividad extends RecyclerView.Adapter<AdaptadorItemActividad.ItemViewHolder>{
     Context context;

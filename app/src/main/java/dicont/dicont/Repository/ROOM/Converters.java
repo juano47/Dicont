@@ -1,4 +1,4 @@
-package dicont.dicont.DAO.ROOM;
+package dicont.dicont.Repository.ROOM;
 
 import androidx.room.TypeConverter;
 
