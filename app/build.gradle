@@ -43,6 +43,7 @@ dependencies {
     def room_version = "2.2.0-beta01"                               //ROOM
     implementation "androidx.room:room-runtime:$room_version"       //ROOM
     annotationProcessor "androidx.room:room-compiler:$room_version" //ROOM
+    implementation 'org.greenrobot:eventbus:3.2.0'                  //EventBus
 }
 
 apply plugin: 'com.google.gms.google-services' //Firebase

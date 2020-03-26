@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -68,7 +69,6 @@ public class Ingreso extends AppCompatActivity{
 
                 progressDialog.setMessage("Autenticando");
                 progressDialog.show();
-
                 IngresoController.getInstance().loginUser(email, pass);
             }
         });
@@ -96,6 +96,7 @@ public class Ingreso extends AppCompatActivity{
         public void onResultLoginUser(){  //Resultado exitoso. Caso contrario vuelve por showMessageError
 
             progressDialog.dismiss();
+
             //Único punto de acceso a la app desde esta clase
             Intent i = new Intent(Ingreso.this, Inicio.class);
             startActivity(i);
@@ -118,7 +119,6 @@ public class Ingreso extends AppCompatActivity{
             builder.setMessage("Te hemos enviado un correo electrónico (Revisar spam)")
                     .setTitle("Restablecimiento de contraseña")
                     .setPositiveButton("Aceptar", new DialogInterface.OnClickListener(){
-
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             //no hace falta hacer nada, solo mostramos un mensaje.

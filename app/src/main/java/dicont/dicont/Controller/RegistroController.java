@@ -1,10 +1,13 @@
 package dicont.dicont.Controller;
 
-import dicont.dicont.Model.User;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import dicont.dicont.EventBus.MessageEvent;
+import dicont.dicont.EventBus.MessageEventUserAuthFirebase;
+import dicont.dicont.EventBus.MessageEventUserDatabaseFirebase;
 import dicont.dicont.Repository.Firebase.Authentication.UserAuthFirebase;
 import dicont.dicont.Repository.Firebase.Database.UserDatabaseFirebase;
-import dicont.dicont.Repository.UserRepository;
-import dicont.dicont.Views.Login.Ingreso;
 import dicont.dicont.Views.Login.Registro;
 
 public class RegistroController {
@@ -25,9 +28,6 @@ public class RegistroController {
     }
 
     private RegistroController() {
-        //seteamos la interfaz de comunicacion con UserDatabaseFirebase y UserAuthFirebase por única vez
-        UserAuthFirebase.getInstance().setmCallbackRegistroController(callbackInterfaceRegistroController);
-        UserDatabaseFirebase.getInstance().setmCallbackRegistroController(callbackInterfaceRegistroController);
     }
 
     public void setmCallbackRegistro (Registro.CallbackInterfaceRegistro mCallbackRegistro){
@@ -40,38 +40,34 @@ public class RegistroController {
         this.apellido = apellido;
         this.email = email;
 
-        UserRepository.getInstance().userRegister(email, clave);
+        //Nos registramos al bus de eventos para recibir la respuesta asincrona de los métodos de Firebase
+        EventBus.getDefault().register(RegistroController.this);
+
+        UserAuthFirebase.getInstance().userRegister(email, clave);
     }
 
-    public interface CallbackInterfaceRegistroController {
-        void onResultRegisterUser();
-        void onResultSendEmailVerification();
-        void showMessageError(String message);
-        void onResultCrearUser();
-    }
-
-    public CallbackInterfaceRegistroController callbackInterfaceRegistroController = new CallbackInterfaceRegistroController() {
-        @Override
-        public void onResultRegisterUser() {
+        @Subscribe
+        public void onResultUserRegister(MessageEventUserAuthFirebase.userRegister messageEvent) {
             mCallbackRegistro.showMessageSuccess("El usuario se registro con éxito");
-            UserRepository.getInstance().sendEmailVerification();
+            UserAuthFirebase.getInstance().sendEmailVerification();
         }
 
-        @Override
-        public void onResultSendEmailVerification() {
+        @Subscribe
+        public void onResultSendEmailVerification(MessageEventUserAuthFirebase.sendEmailVerification messageEvent) {
             mCallbackRegistro.showMessageSuccess("Se envió el email de verificación!");
-            UserRepository.getInstance().crearUser(nombre, apellido, email);
+            UserDatabaseFirebase.getInstance().crearUser(nombre, apellido, email);
         }
 
-        @Override
-        public void showMessageError(String message) {
-            mCallbackRegistro.showMessageError(message);
+        @Subscribe
+        public void showMessageError(MessageEvent messageEvent) {
+            EventBus.getDefault().unregister(RegistroController.this);
+            mCallbackRegistro.showMessageError(messageEvent.messageError);
         }
 
-        @Override
-        public void onResultCrearUser() {
+        @Subscribe
+        public void onResultCrearUser(MessageEventUserDatabaseFirebase.crearUser messageEvent) { //Único punto exitoso de salida para el registro
+            EventBus.getDefault().unregister(RegistroController.this);
             mCallbackRegistro.showMessageSuccess("Se creo el usuario en la base de datos!");
             mCallbackRegistro.onResultUserRegister();
         }
-    };
 }

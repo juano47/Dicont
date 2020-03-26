@@ -11,17 +11,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import dicont.dicont.Controller.IngresoController;
-import dicont.dicont.Controller.RegistroController;
+import org.greenrobot.eventbus.EventBus;
+
+import dicont.dicont.EventBus.MessageEvent;
+import dicont.dicont.EventBus.MessageEventUserDatabaseFirebase;
 import dicont.dicont.Model.User;
-import dicont.dicont.Views.Login.Registro;
 
 public class UserDatabaseFirebase {
 
     private static UserDatabaseFirebase ourInstance;
-
-    private IngresoController.CallbackInterfaceIngresoController mCallbackIngresoController;
-    private RegistroController.CallbackInterfaceRegistroController mCallbackRegistroController;
 
     public static UserDatabaseFirebase getInstance() {
         if (ourInstance == null){
@@ -32,15 +30,6 @@ public class UserDatabaseFirebase {
 
     private UserDatabaseFirebase() {
     }
-
-    public void setmCallbackIngresoController (IngresoController.CallbackInterfaceIngresoController mCallbackIngresoController){
-        ourInstance.mCallbackIngresoController = mCallbackIngresoController;
-    }
-
-    public void setmCallbackRegistroController(RegistroController.CallbackInterfaceRegistroController mCallbackRegistroController) {
-        ourInstance.mCallbackRegistroController = mCallbackRegistroController;
-    }
-
 
     public void getUser() {
         Log.e("getUser", "llega");
@@ -60,16 +49,16 @@ public class UserDatabaseFirebase {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     User user = dataSnapshot.getValue(User.class);
-                    mCallbackIngresoController.onResultGetUser(user);
+                    EventBus.getDefault().post(new MessageEventUserDatabaseFirebase.getUser(user));
                 }
                 else {
-                    mCallbackIngresoController.showMessageError("Hubo un error al acceder. Intentalo de nuevo");
+                    EventBus.getDefault().post(new MessageEvent("Hubo un error al acceder. Intentalo de nuevo"));
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                mCallbackIngresoController.showMessageError("Hubo un error al acceder. Intentalo de nuevo");
+                EventBus.getDefault().post(new MessageEvent("Hubo un error al acceder. Intentalo de nuevo"));
             }
         });
     }
@@ -81,9 +70,9 @@ public class UserDatabaseFirebase {
             mDatabase = FirebaseDatabase.getInstance().getReference();
             mDatabase.child("Users").child(mAuth.getCurrentUser().getUid()).setValue(user);
 
-            mCallbackIngresoController.onResultUpdateUser(user);
+            EventBus.getDefault().post(new MessageEventUserDatabaseFirebase.updateUser(user));
         } catch (Exception e){
-            mCallbackIngresoController.showMessageError("Hubo un error al actualizar el usuario en la base de datos");
+            EventBus.getDefault().post(new MessageEvent("Hubo un error al actualizar el usuario en la base de datos"));
             //Falta la lógica para este error!
         }
     }
@@ -101,9 +90,9 @@ public class UserDatabaseFirebase {
             user.setEstado(0);
             mDatabase.child("Users").child(userID).setValue(user);
 
-            mCallbackRegistroController.onResultCrearUser();
+           EventBus.getDefault().post(new MessageEventUserDatabaseFirebase.crearUser());
         }catch (Exception e){
-            mCallbackRegistroController.showMessageError("Hubo un error al guardar el usuario en la base de datos");
+            EventBus.getDefault().post(new MessageEvent("Hubo un error al guardar el usuario en la base de datos"));
             //Falta la lógica para este error!
         }
 

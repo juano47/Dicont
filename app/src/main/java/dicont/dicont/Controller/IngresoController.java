@@ -2,13 +2,17 @@ package dicont.dicont.Controller;
 
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import dicont.dicont.EventBus.MessageEvent;
+import dicont.dicont.EventBus.MessageEventUserAuthFirebase;
+import dicont.dicont.EventBus.MessageEventUserDatabaseFirebase;
 import dicont.dicont.Model.DataUser;
 import dicont.dicont.Model.User;
 import dicont.dicont.Repository.Firebase.Authentication.UserAuthFirebase;
 import dicont.dicont.Repository.Firebase.Database.UserDatabaseFirebase;
-import dicont.dicont.Repository.UserRepository;
 import dicont.dicont.Views.Login.Ingreso;
-import dicont.dicont.Views.Login.Registro;
 
 public class IngresoController {
 
@@ -20,13 +24,11 @@ public class IngresoController {
         if(ourInstance == null){
             ourInstance =new IngresoController();
         }
+
         return ourInstance;
     }
 
     private IngresoController() {
-        //seteamos la interfaz de comunicacion con UserDatabaseFirebase y UserAuthFirebase por única vez
-        UserAuthFirebase.getInstance().setmCallbackIngresoController(callbackInterfaceIngresoController);
-        UserDatabaseFirebase.getInstance().setmCallbackIngresoController(callbackInterfaceIngresoController);
     }
 
     public void setmCallbackIngreso (Ingreso.CallbackInterfaceIngreso mCallbackIngreso){
@@ -34,80 +36,78 @@ public class IngresoController {
     }
 
     public void loginUser(String email, String pass) {
+        //Nos registramos al bus de eventos para recibir la respuesta asincrona de los métodos de Firebase
+        EventBus.getDefault().register(IngresoController.this);
         //primero verificamos si los datos son correctos. Se hace usando el servicio de Firebase Auth
-        UserRepository.getInstance().validarUser(email, pass);
+        UserAuthFirebase.getInstance().validarUser(email, pass);
         //Continua en onResultValidarUser
     }
 
     private void ingresoExitoso(User user){
+        EventBus.getDefault().unregister(IngresoController.this);
         //seteamos el user en el singleton DataUser
         DataUser.getInstance().setUser(user);
         //devolvemos la ejecución al activity Ingreso
-        mCallbackIngreso.onResultLoginUser();
+        mCallbackIngreso.onResultLoginUser(); //Único punto de accceso exitoso del Login
     }
 
-    public void restablecerClave(String email) {        //sigue en onResultRegisterUser o showMessageError
-        UserRepository.getInstance().restablecerClave(email);
+    public void restablecerClave(String email) {
+        //Nos registramos al bus de eventos para recibir la respuesta asincrona de los métodos de Firebase
+        EventBus.getDefault().register(IngresoController.this);
+        UserAuthFirebase.getInstance().restablecerClave(email);
+        //sigue en onResultRestablecerClave
     }
 
+    @Subscribe
+    public void onResultValidarUser(MessageEventUserAuthFirebase.validarUser messageEvent) {
 
-
-    public interface CallbackInterfaceIngresoController {
-        //Métodos para Ingreso
-        void onResultValidarUser(boolean result);
-        void onResultGetUser(User user);
-        void onResultUpdateUser(User user);
-        void showMessageError(String message);
-        void onResultRestablecerClave(boolean result);
-    }
-
-    private CallbackInterfaceIngresoController callbackInterfaceIngresoController = new CallbackInterfaceIngresoController() {
-
-        @Override
-        public void onResultValidarUser(boolean result){
-            if (result){
-                if (UserRepository.getInstance().checkearEmailVerificado()){
-                    Log.e("if 1 loginUser", "entra");
-                    //obtenemos el usuario de la base de datos. Usamos el servicio de Firebase Database
-                    UserRepository.getInstance().getUser();
-                    //Continua en el método onResultGetUser
-                } else {
-                    mCallbackIngreso.showMessageError("Verifica tu correo para poder ingresar");
-                }
-            }else {
-                mCallbackIngreso.showMessageError("Los datos ingresados no son correctos");
-            }
-        }
-
-        @Override
-        public void onResultGetUser(User user) {
-            //Si el estado está en 0: lo actualizamos a 1 -> pasa del estado "email no verificado" a "email verificado"
-            if (user.getEstado()==0) {
-                user.setEstado(1);
-                UserRepository.getInstance().updateUser(user);
-                //continúa en el método onResultUpdateUser o showMessageError
+        if (messageEvent.result){
+            if (UserAuthFirebase.getInstance().checkearEmailVerificado()){
+                Log.e("if 1 loginUser", "entra");
+                //obtenemos el usuario de la base de datos. Usamos el servicio de Firebase Database
+                UserDatabaseFirebase.getInstance().getUser();
+                //Continua en el método onResultGetUser
             } else {
-                ingresoExitoso(user);
+                EventBus.getDefault().unregister(IngresoController.this);
+                mCallbackIngreso.showMessageError("Verifica tu correo para poder ingresar");
             }
+        }else {
+            EventBus.getDefault().unregister(IngresoController.this);
+            mCallbackIngreso.showMessageError("Los datos ingresados no son correctos");
         }
+    }
 
-        @Override
-        public void onResultUpdateUser(User user) {
+    @Subscribe
+    public void onResultGetUser(MessageEventUserDatabaseFirebase.getUser messageEvent) {
+        //Si el estado está en 0: lo actualizamos a 1 -> pasa del estado "email no verificado" a "email verificado"
+        User user = messageEvent.user;
+        if (user.getEstado()==0) {
+            user.setEstado(1);
+            UserDatabaseFirebase.getInstance().updateUser(user);
+            //continúa en el método onResultUpdateUser o showMessageError
+        } else {
             ingresoExitoso(user);
         }
+    }
 
-        @Override
-        public void showMessageError(String message) {
-            mCallbackIngreso.showMessageError(message);
+        @Subscribe
+        public void onResultUpdateUser(MessageEventUserDatabaseFirebase.updateUser messageEvent) {
+            ingresoExitoso(messageEvent.user);
         }
 
-        @Override
-        public void onResultRestablecerClave(boolean result) {
-            if (result){
+        @Subscribe
+        public void showMessageError(MessageEvent messageEvent) {
+            EventBus.getDefault().unregister(IngresoController.this);
+            mCallbackIngreso.showMessageError(messageEvent.messageError);
+        }
+
+        @Subscribe
+        public void onResultRestablecerClave(MessageEventUserAuthFirebase.restablecerClave messageEvent) {
+            EventBus.getDefault().unregister(IngresoController.this);
+            if (messageEvent.result){
                 mCallbackIngreso.onResultRestablecerClave();
             } else {
                 mCallbackIngreso.showMessageError("No tenemos un usuario registrado con ese correo. Intenta de nuevo o prueba registrarte sino lo has hecho");
             }
         }
-    };
 }
